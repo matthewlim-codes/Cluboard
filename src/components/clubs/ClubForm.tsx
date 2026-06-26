@@ -16,6 +16,7 @@ import {
 
 interface ClubFormProps {
   initial?: Club;
+  templateData?: ClubFormData;
   onSubmit: (data: ClubFormData) => void;
   submitLabel: string;
 }
@@ -24,6 +25,7 @@ const EMPTY_OFFICER: Officer = { name: '', role: '', email: '' };
 
 const defaultForm: ClubFormData = {
   name: '',
+  tagline: '',
   description: '',
   logo: '',
   meetingTime: '',
@@ -34,14 +36,17 @@ const defaultForm: ClubFormData = {
   category: 'other',
   meetingDays: [],
   gradeLevels: ['9', '10', '11', '12'],
+  howToJoin: 'Show up to the next meeting',
+  openToBeginners: true,
   contactEmail: '',
 };
 
-export function ClubForm({ initial, onSubmit, submitLabel }: ClubFormProps) {
+export function ClubForm({ initial, templateData, onSubmit, submitLabel }: ClubFormProps) {
   const [form, setForm] = useState<ClubFormData>(
     initial
       ? {
           name: initial.name,
+          tagline: initial.tagline,
           description: initial.description,
           logo: initial.logo ?? '',
           meetingTime: initial.meetingTime,
@@ -52,9 +57,11 @@ export function ClubForm({ initial, onSubmit, submitLabel }: ClubFormProps) {
           category: initial.category,
           meetingDays: initial.meetingDays,
           gradeLevels: initial.gradeLevels,
+          howToJoin: initial.howToJoin,
+          openToBeginners: initial.openToBeginners,
           contactEmail: initial.contactEmail ?? '',
         }
-      : defaultForm,
+      : templateData ?? defaultForm,
   );
   const [tagsInput, setTagsInput] = useState(initial?.tags.join(', ') ?? '');
 
@@ -113,6 +120,18 @@ export function ClubForm({ initial, onSubmit, submitLabel }: ClubFormProps) {
           value={form.name}
           onChange={(e) => update('name', e.target.value)}
           placeholder="e.g. National Honor Society"
+          className={inputClass}
+        />
+      </Field>
+
+      <Field label="One-liner" required>
+        <input
+          type="text"
+          required
+          maxLength={80}
+          value={form.tagline}
+          onChange={(e) => update('tagline', e.target.value)}
+          placeholder="Short summary for club cards (max 80 chars)"
           className={inputClass}
         />
       </Field>
@@ -222,6 +241,17 @@ export function ClubForm({ initial, onSubmit, submitLabel }: ClubFormProps) {
         />
       </Field>
 
+      <Field label="How to join" required>
+        <input
+          type="text"
+          required
+          value={form.howToJoin}
+          onChange={(e) => update('howToJoin', e.target.value)}
+          placeholder="e.g. Show up to the next meeting"
+          className={inputClass}
+        />
+      </Field>
+
       <Field label="Contact email">
         <input
           type="email"
@@ -287,12 +317,25 @@ export function ClubForm({ initial, onSubmit, submitLabel }: ClubFormProps) {
       <label className="flex items-center gap-3 rounded-xl border border-neutral-200 p-3">
         <input
           type="checkbox"
+          checked={form.openToBeginners}
+          onChange={(e) => update('openToBeginners', e.target.checked)}
+          className="h-4 w-4 rounded border-neutral-300 text-pink-500 focus:ring-pink-400"
+        />
+        <div>
+          <p className="text-sm font-medium text-neutral-900">Open to beginners</p>
+          <p className="text-xs text-neutral-500">No experience needed — good for new students</p>
+        </div>
+      </label>
+
+      <label className="flex items-center gap-3 rounded-xl border border-neutral-200 p-3">
+        <input
+          type="checkbox"
           checked={form.featured}
           onChange={(e) => update('featured', e.target.checked)}
           className="h-4 w-4 rounded border-neutral-300 text-pink-500 focus:ring-pink-400"
         />
         <div>
-          <p className="text-sm font-medium text-neutral-900">Featured club</p>
+          <p className="text-sm font-medium text-neutral-900">On the shelf (featured)</p>
           <p className="text-xs text-neutral-500">Show in the featured row on Home</p>
         </div>
       </label>

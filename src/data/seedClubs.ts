@@ -8,6 +8,7 @@ export const SEED_CLUBS: Club[] = [
   {
     id: 'nhs',
     name: 'National Honor Society',
+    tagline: 'Honor society — tutoring, service, leadership',
     description:
       'Recognizing outstanding high school students who demonstrate scholarship, service, leadership, and character. NHS members lead tutoring programs, community service projects, and school-wide initiatives that make a real difference.',
     logo: undefined,
@@ -23,6 +24,8 @@ export const SEED_CLUBS: Club[] = [
     category: 'academic',
     meetingDays: ['wednesday'],
     gradeLevels: ['10', '11', '12'],
+    howToJoin: 'Apply in the fall — GPA and teacher recommendations required',
+    openToBeginners: false,
     contactEmail: 'nhs@school.edu',
     featured: true,
     posts: [
@@ -54,6 +57,7 @@ export const SEED_CLUBS: Club[] = [
   {
     id: 'interact',
     name: 'Interact',
+    tagline: 'Plan service projects with Rotary',
     description:
       'A youth leadership club partnered with Rotary International. Interact members plan service projects, develop leadership skills, and make a positive impact in our school and community through hands-on action.',
     logo: undefined,
@@ -64,10 +68,12 @@ export const SEED_CLUBS: Club[] = [
       { name: 'Tyler Kim', role: 'Vice President', email: 'tkim@school.edu' },
       { name: 'Aisha Johnson', role: 'Service Chair', email: 'ajohnson@school.edu' },
     ],
-    tags: ['leadership', 'service', 'rotary', 'community', 'youth'],
+    tags: ['leadership', 'service', 'rotary', 'community', 'youth', 'beginner-friendly'],
     category: 'service',
     meetingDays: ['tuesday'],
     gradeLevels: ['9', '10', '11', '12'],
+    howToJoin: 'Show up to any Tuesday meeting — all grade levels welcome',
+    openToBeginners: true,
     contactEmail: 'interact@school.edu',
     featured: true,
     posts: [

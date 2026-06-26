@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import {
   ArrowLeft,
-  Calendar,
   Clock,
   Mail,
   MapPin,
@@ -11,10 +10,16 @@ import {
 } from 'lucide-react';
 import { AppShell } from '../components/layout/AppShell';
 import { ClubAvatar } from '../components/clubs/ClubAvatar';
+import { ShareClubLink } from '../components/clubs/FeaturedClubsRow';
+import { IsThisForMeCard } from '../components/clubs/IsThisForMeCard';
+import { NextMeetingBar } from '../components/clubs/NextMeetingBar';
+import { SaveClubButton } from '../components/clubs/SaveClubButton';
 import { PostCard } from '../components/feed/PostCard';
+import { CopyButton } from '../components/ui/CopyButton';
 import { useClubs } from '../context/ClubsContext';
 import type { Club } from '../types/club';
 import { CATEGORY_LABELS, DAY_LABELS } from '../types/club';
+import { getClubTagline } from '../lib/clubUtils';
 
 type Tab = 'about' | 'schedule' | 'posts' | 'contact';
 
@@ -55,32 +60,34 @@ export function ClubProfilePage() {
             <ArrowLeft className="h-5 w-5" />
           </Link>
           <span className="truncate font-semibold text-neutral-900">{club.name}</span>
-          <Link
-            to={`/club/${club.id}/edit`}
-            className="flex items-center gap-1 text-sm font-medium text-pink-600"
-          >
-            <Pencil className="h-4 w-4" />
-            Edit
-          </Link>
+          <div className="flex items-center gap-1">
+            <SaveClubButton clubId={club.id} />
+            <Link
+              to={`/club/${club.id}/edit`}
+              className="flex items-center gap-1 text-sm font-medium text-pink-600"
+            >
+              <Pencil className="h-4 w-4" />
+            </Link>
+          </div>
         </div>
       </header>
 
-      <div className="px-4 pt-6">
+      <NextMeetingBar club={club} />
+
+      <div className="px-4 pt-4">
         <div className="flex items-center gap-5">
           <ClubAvatar name={club.name} id={club.id} logo={club.logo} size="xl" />
           <div className="min-w-0 flex-1">
             <h1 className="text-xl font-bold text-neutral-900">{club.name}</h1>
+            <p className="mt-0.5 text-sm font-medium text-pink-600">
+              {getClubTagline(club)}
+            </p>
             <p className="mt-0.5 text-sm text-neutral-500">
               {CATEGORY_LABELS[club.category]}
               {club.featured && (
-                <span className="ml-2 text-pink-600">· Featured</span>
+                <span className="ml-2 text-pink-600">· On the shelf</span>
               )}
             </p>
-            <div className="mt-3 flex gap-6 text-center">
-              <Stat label="Posts" value={club.posts.length} />
-              <Stat label="Officers" value={club.officers.length} />
-              <Stat label="Tags" value={club.tags.length} />
-            </div>
           </div>
         </div>
 
@@ -95,6 +102,14 @@ export function ClubProfilePage() {
               #{tag}
             </span>
           ))}
+        </div>
+
+        <div className="mt-4">
+          <IsThisForMeCard club={club} />
+        </div>
+
+        <div className="mt-3">
+          <ShareClubLink clubId={club.id} clubName={club.name} />
         </div>
       </div>
 
@@ -125,20 +140,16 @@ export function ClubProfilePage() {
   );
 }
 
-function Stat({ label, value }: { label: string; value: number }) {
-  return (
-    <div>
-      <p className="text-lg font-bold text-neutral-900">{value}</p>
-      <p className="text-xs text-neutral-500">{label}</p>
-    </div>
-  );
-}
-
 function AboutTab({ club }: { club: Club }) {
   return (
     <div className="space-y-4">
       <InfoRow icon={Clock} label="Meeting time" value={club.meetingTime} />
-      <InfoRow icon={MapPin} label="Location" value={club.meetingLocation} />
+      <InfoRow
+        icon={MapPin}
+        label="Location"
+        value={club.meetingLocation}
+        copyText={club.meetingLocation}
+      />
       <InfoRow
         icon={Users}
         label="Grade levels"
@@ -157,12 +168,15 @@ function AboutTab({ club }: { club: Club }) {
                 <p className="text-xs text-neutral-500">{officer.role}</p>
               </div>
               {officer.email && (
-                <a
-                  href={`mailto:${officer.email}`}
-                  className="text-xs text-pink-600"
-                >
-                  Email
-                </a>
+                <div className="flex items-center gap-2">
+                  <CopyButton text={officer.email} label="Copy" />
+                  <a
+                    href={`mailto:${officer.email}`}
+                    className="text-xs text-pink-600"
+                  >
+                    Email
+                  </a>
+                </div>
               )}
             </div>
           ))}
@@ -175,20 +189,7 @@ function AboutTab({ club }: { club: Club }) {
 function ScheduleTab({ club }: { club: Club }) {
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl border border-neutral-200 p-4">
-        <div className="flex items-center gap-2 text-sm font-semibold text-neutral-900">
-          <Calendar className="h-4 w-4 text-pink-500" />
-          Regular meetings
-        </div>
-        <p className="mt-2 text-sm text-neutral-700">{club.meetingTime}</p>
-        <p className="mt-1 text-sm text-neutral-500">
-          {club.meetingDays.map((d) => DAY_LABELS[d]).join(', ')}
-        </p>
-        <p className="mt-3 flex items-center gap-1.5 text-sm text-neutral-600">
-          <MapPin className="h-3.5 w-3.5 text-neutral-400" />
-          {club.meetingLocation}
-        </p>
-      </div>
+      <NextMeetingBar club={club} />
       <p className="text-xs text-neutral-400">
         Check the Posts tab for event announcements and schedule changes.
       </p>
@@ -223,16 +224,14 @@ function ContactTab({ club }: { club: Club }) {
   return (
     <div className="space-y-4">
       {club.contactEmail && (
-        <a
-          href={`mailto:${club.contactEmail}`}
-          className="flex items-center gap-3 rounded-2xl border border-neutral-200 p-4 transition-colors hover:bg-neutral-50"
-        >
+        <div className="flex items-center gap-3 rounded-2xl border border-neutral-200 p-4">
           <Mail className="h-5 w-5 text-pink-500" />
-          <div>
+          <div className="min-w-0 flex-1">
             <p className="text-sm font-medium text-neutral-900">Club email</p>
-            <p className="text-sm text-pink-600">{club.contactEmail}</p>
+            <p className="truncate text-sm text-pink-600">{club.contactEmail}</p>
           </div>
-        </a>
+          <CopyButton text={club.contactEmail} label="Copy" />
+        </div>
       )}
       <div>
         <h3 className="mb-2 text-sm font-semibold text-neutral-900">Officer contacts</h3>
@@ -246,17 +245,21 @@ function ContactTab({ club }: { club: Club }) {
                 {officer.name} — {officer.role}
               </p>
               {officer.email && (
-                <a
-                  href={`mailto:${officer.email}`}
-                  className="text-xs text-pink-600"
-                >
-                  {officer.email}
-                </a>
+                <div className="mt-1 flex items-center gap-2">
+                  <a
+                    href={`mailto:${officer.email}`}
+                    className="text-xs text-pink-600"
+                  >
+                    {officer.email}
+                  </a>
+                  <CopyButton text={officer.email} label="Copy" />
+                </div>
               )}
             </div>
           ))}
         </div>
       </div>
+      <SaveClubButton clubId={club.id} variant="button" />
     </div>
   );
 }
@@ -265,17 +268,20 @@ function InfoRow({
   icon: Icon,
   label,
   value,
+  copyText,
 }: {
   icon: typeof Clock;
   label: string;
   value: string;
+  copyText?: string;
 }) {
   return (
     <div className="flex items-start gap-3">
       <Icon className="mt-0.5 h-4 w-4 shrink-0 text-neutral-400" />
-      <div>
+      <div className="min-w-0 flex-1">
         <p className="text-xs font-medium text-neutral-500">{label}</p>
         <p className="text-sm text-neutral-800">{value}</p>
+        {copyText && <CopyButton text={copyText} label="Copy" className="mt-1" />}
       </div>
     </div>
   );

@@ -1,15 +1,25 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { AppShell, PageHeader } from '../components/layout/AppShell';
 import { ClubCard } from '../components/clubs/ClubCard';
 import { FilterBar } from '../components/filters/FilterBar';
 import { SearchInput } from '../components/ui/SearchInput';
+import { IntentEntryPoints } from '../components/home/QuickFilters';
 import { useClubs } from '../context/ClubsContext';
-import { DEFAULT_FILTERS, filterAndSortClubs, type ClubFilters } from '../lib/clubUtils';
+import { useUserPrefs } from '../context/UserPrefsContext';
+import {
+  applyIntentPreset,
+  DEFAULT_FILTERS,
+  filterAndSortClubs,
+  type ClubFilters,
+} from '../lib/clubUtils';
 
 export function ExplorePage() {
   const { clubs } = useClubs();
+  const { prefs } = useUserPrefs();
   const [filters, setFilters] = useState<ClubFilters>({
     ...DEFAULT_FILTERS,
+    grade: prefs.grade || '',
     sort: 'most-active',
   });
   const filtered = filterAndSortClubs(clubs, filters);
@@ -17,8 +27,12 @@ export function ExplorePage() {
   return (
     <AppShell>
       <PageHeader
-        title="Explore"
-        subtitle="Search and discover school clubs"
+        title="Search"
+        subtitle="Find clubs by name, keyword, or location"
+      />
+
+      <IntentEntryPoints
+        onSelect={(preset) => setFilters(applyIntentPreset(preset, prefs.grade))}
       />
 
       <section className="space-y-3 px-4 py-4">
@@ -41,9 +55,12 @@ export function ExplorePage() {
               <p className="mt-1 text-xs text-neutral-400">
                 Open the Cluboard — create a club to get started
               </p>
+              <Link to="/create" className="mt-3 inline-block text-sm font-medium text-pink-600">
+                Add a club
+              </Link>
             </div>
           ) : (
-            filtered.map((club) => <ClubCard key={club.id} club={club} />)
+            filtered.map((club) => <ClubCard key={club.id} club={club} showSave />)
           )}
         </div>
       </section>

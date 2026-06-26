@@ -110,7 +110,7 @@ function FilterChip({
     <button
       type="button"
       onClick={onClick}
-      className={`shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-medium transition-colors ${
+      className={`shrink-0 rounded-full border px-4 py-2.5 text-xs font-semibold transition-colors ${
         active
           ? 'border-pink-500 bg-pink-500 text-white'
           : 'border-neutral-200 bg-white text-neutral-600 hover:border-neutral-300'

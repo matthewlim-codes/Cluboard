@@ -1,11 +1,13 @@
 import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { ClubsProvider } from './context/ClubsContext';
+import { UserPrefsProvider } from './context/UserPrefsContext';
 import { BottomNav } from './components/layout/BottomNav';
+import { OnboardingModal } from './components/onboarding/OnboardingModal';
 import { HomePage } from './pages/HomePage';
 import { ExplorePage } from './pages/ExplorePage';
 import { ClubProfilePage } from './pages/ClubProfilePage';
 import { CreateClubPage, EditClubPage } from './pages/ClubFormPage';
-import { ProfilePage } from './pages/ProfilePage';
+import { SavedPage } from './pages/SavedPage';
 
 function AppRoutes() {
   const location = useLocation();
@@ -13,11 +15,13 @@ function AppRoutes() {
 
   return (
     <>
+      <OnboardingModal />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/explore" element={<ExplorePage />} />
         <Route path="/create" element={<CreateClubPage />} />
-        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/saved" element={<SavedPage />} />
+        <Route path="/profile" element={<SavedPage />} />
         <Route path="/club/:id" element={<ClubProfilePage />} />
         <Route path="/club/:id/edit" element={<EditClubPage />} />
       </Routes>
@@ -29,9 +33,11 @@ function AppRoutes() {
 export default function App() {
   return (
     <BrowserRouter>
-      <ClubsProvider>
-        <AppRoutes />
-      </ClubsProvider>
+      <UserPrefsProvider>
+        <ClubsProvider>
+          <AppRoutes />
+        </ClubsProvider>
+      </UserPrefsProvider>
     </BrowserRouter>
   );
 }

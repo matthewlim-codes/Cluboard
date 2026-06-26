@@ -1,14 +1,18 @@
+import { Compass, Home, Bookmark, PlusSquare } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
-import { Compass, Home, PlusSquare, User } from 'lucide-react';
+import { useUserPrefs } from '../../context/UserPrefsContext';
 
 const navItems = [
-  { to: '/', icon: Home, label: 'Home' },
-  { to: '/explore', icon: Compass, label: 'Explore' },
-  { to: '/create', icon: PlusSquare, label: 'Create' },
-  { to: '/profile', icon: User, label: 'Profile' },
+  { to: '/', icon: Home, label: 'Clubs' },
+  { to: '/explore', icon: Compass, label: 'Search' },
+  { to: '/create', icon: PlusSquare, label: 'Add' },
+  { to: '/saved', icon: Bookmark, label: 'Saved' },
 ];
 
 export function BottomNav() {
+  const { prefs } = useUserPrefs();
+  const savedCount = prefs.savedClubIds.length;
+
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-neutral-200 bg-white safe-bottom">
       <div className="mx-auto flex max-w-lg items-center justify-around px-2 py-2">
@@ -18,7 +22,7 @@ export function BottomNav() {
             to={to}
             end={to === '/'}
             className={({ isActive }) =>
-              `flex flex-col items-center gap-0.5 px-4 py-1 transition-colors ${
+              `relative flex flex-col items-center gap-0.5 px-4 py-1 transition-colors ${
                 isActive ? 'text-neutral-900' : 'text-neutral-400'
               }`
             }
@@ -28,8 +32,13 @@ export function BottomNav() {
                 <Icon
                   className="h-6 w-6"
                   strokeWidth={isActive ? 2.5 : 1.75}
-                  fill={isActive ? 'currentColor' : 'none'}
+                  fill={isActive && to === '/saved' ? 'currentColor' : 'none'}
                 />
+                {to === '/saved' && savedCount > 0 && (
+                  <span className="absolute right-2 top-0 flex h-4 min-w-4 items-center justify-center rounded-full bg-pink-500 px-1 text-[9px] font-bold text-white">
+                    {savedCount}
+                  </span>
+                )}
                 <span className="text-[10px] font-medium">{label}</span>
               </>
             )}

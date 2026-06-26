@@ -15,6 +15,7 @@ export interface Post {
 export interface Club {
   id: string;
   name: string;
+  tagline: string;
   description: string;
   logo?: string;
   meetingTime: string;
@@ -26,6 +27,8 @@ export interface Club {
   category: ClubCategory;
   meetingDays: DayOfWeek[];
   gradeLevels: GradeLevel[];
+  howToJoin: string;
+  openToBeginners: boolean;
   contactEmail?: string;
   createdAt: string;
   updatedAt: string;
